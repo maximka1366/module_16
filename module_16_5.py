@@ -9,7 +9,7 @@ app = FastAPI()
 
 # Инициализация  Jinja2
 templates = Jinja2Templates(directory="templates")
-
+users = []
 
 
 class User(BaseModel):
@@ -17,9 +17,6 @@ class User(BaseModel):
     username: str
     age: int
 
-
-
-users: List[User] = []
 
 
 
@@ -38,10 +35,18 @@ async def get_user(request: Request, user_id: int):
 
 @app.post("/user/{username}/{age}", response_model=User)
 async def create_user(username: str, age: int) -> User:
-    new_user_id = len(users) + 1
-    new_user = User(id=new_user_id, username=username, age=age)
-    users.append(new_user)
-    return new_user
+    id = 1
+    id_list = [user.id for user in users]
+    if id not in id_list:
+        new_user = User(id=1, username=username, age=age)
+        users.append(new_user)
+    else:
+        while id in id_list:
+            id += 1
+        new_user = User(id=id, username=username, age=age)
+        users.append(new_user)
+    return  new_user
+
 
 
 @app.put("/user/{user_id}/{username}/{age}", response_model=User)
